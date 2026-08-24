@@ -2,13 +2,13 @@
 
 **Software-only wireless network simulator for exploring Bluetooth Adaptive Frequency Hopping and Wi-Fi IP routing.**
 
-WaveForge turns wireless concepts into an interactive simulation: no radio hardware, packet injection, scanning, or physical network access is required. The project models protocol behavior, interference, attenuation, routing, latency, and power as software-only abstractions. The repository started as a chip-free simulator contrasting Bluetooth 79-channel AFH with Wi-Fi hub-and-spoke routing. fileciteturn238file0L2-L2
+WaveForge turns wireless concepts into an interactive simulation without radio hardware or physical network access. It models protocol behavior, interference, attenuation, routing, latency, and power as software-only abstractions. The original project concept contrasts Bluetooth 79-channel AFH with Wi-Fi hub-and-spoke routing.
 
 ## ✨ Features
 
 ### Bluetooth
 - 79-channel Adaptive Frequency Hopping model
-- Dynamic interference zones
+- Dynamic simulated interference zones
 - Automatic exclusion of blocked channels
 - Pairing enforcement
 - Packet frequency metadata
@@ -32,6 +32,7 @@ WaveForge turns wireless concepts into an interactive simulation: no radio hardw
 
 ### Developer experience
 - Modular `src/` architecture
+- Python 3.9+ compatible typing
 - Type hints and docstrings
 - Pytest regression suite
 - GitHub Actions on Python 3.9–3.12
@@ -70,7 +71,7 @@ git clone https://github.com/hunterkritik-byte/WaveForge.git
 cd WaveForge
 python -m venv .venv
 # Linux/macOS: source .venv/bin/activate
-# Windows: .venv\Scripts\activate
+# Windows: .venv\\Scripts\\activate
 python -m pip install -r requirements.txt
 python main.py
 ```
