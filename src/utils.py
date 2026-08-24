@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import random
+from typing import Optional, Set
 
 
 def attenuation(distance: float, reference_distance: float = 1.0, exponent: float = 2.0) -> float:
@@ -12,7 +13,7 @@ def attenuation(distance: float, reference_distance: float = 1.0, exponent: floa
     return min(1.0, (reference_distance / max(distance, reference_distance)) ** exponent)
 
 
-def noise_channels(count: int, blocked: int, rng: random.Random | None = None) -> set[int]:
+def noise_channels(count: int, blocked: int, rng: Optional[random.Random] = None) -> Set[int]:
     """Choose up to *blocked* unique channel indexes using a supplied RNG."""
     if count < 0 or blocked < 0:
         raise ValueError("counts must be non-negative")
