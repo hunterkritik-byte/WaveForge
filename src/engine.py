@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import random
-from typing import Any
+from typing import Any, Dict, Optional, Set, Tuple
 
 
 class BaseNode(ABC):
@@ -13,7 +13,7 @@ class BaseNode(ABC):
         self.node_id, self.x, self.y, self.active = node_id, x, y, True
 
     @property
-    def position(self) -> tuple[float, float]:
+    def position(self) -> Tuple[float, float]:
         return self.x, self.y
 
 
@@ -23,8 +23,8 @@ class DataPacket:
     source_id: str
     destination_id: str
     payload_size: int
-    current_frequency: int | None = None
-    target_ip: str | None = None
+    current_frequency: Optional[int] = None
+    target_ip: Optional[str] = None
     packet_id: int = 0
 
 
@@ -32,10 +32,10 @@ class BluetoothNode(BaseNode):
     """Bluetooth node using a simulated 79-channel AFH map."""
     channels = tuple(range(79))
 
-    def __init__(self, node_id: str, x: float = 0.0, y: float = 0.0, rng: random.Random | None = None):
+    def __init__(self, node_id: str, x: float = 0.0, y: float = 0.0, rng: Optional[random.Random] = None):
         super().__init__(node_id, x, y)
-        self.paired: set[str] = set()
-        self.blocked_channels: set[int] = set()
+        self.paired: Set[str] = set()
+        self.blocked_channels: Set[int] = set()
         self.rng = rng or random.Random()
 
     def pair(self, other: "BluetoothNode") -> None:
@@ -60,7 +60,7 @@ class WiFiRouterNode(BaseNode):
     def __init__(self, node_id: str, ip: str = "192.168.1.1", **kwargs: Any):
         super().__init__(node_id, **kwargs)
         self.ip = ip
-        self.routing_table: dict[str, WiFiClientNode] = {}
+        self.routing_table: Dict[str, "WiFiClientNode"] = {}
 
     def register(self, client: "WiFiClientNode") -> None:
         self.routing_table[client.ip] = client
