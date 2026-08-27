@@ -103,7 +103,8 @@ class Simulation:
         distance = max(abs(self.bt_a.x - self.bt_b.x), 0.1)
         signal_factor = attenuation(distance)
         self.rssi_samples.append(rssi_from_distance(distance))
-        delivered = signal_factor >= 0.20 and bool(79 - len(blocked))
+        # At the default ~3-unit separation, the simplified model is still usable.
+        delivered = signal_factor >= 0.08 and bool(79 - len(blocked))
         if delivered:
             self.success += 1
             self.latencies.append(2.0 + len(blocked) * 0.04 + (1.0 - signal_factor))
@@ -145,7 +146,8 @@ def run(config: SimulationConfig | None = None) -> None:
             ha="center", fontsize=9,
         )
 
-    FuncAnimation(fig, update, interval=1000 / config.fps if config else 1000 / 30, cache_frame_data=False)
+    fps = sim.config.fps
+    FuncAnimation(fig, update, interval=1000 / fps, cache_frame_data=False)
     plt.tight_layout(rect=(0, .05, 1, 1))
     plt.show()
 
