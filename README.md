@@ -24,6 +24,7 @@ WaveForge turns wireless concepts into an interactive simulation without radio h
 ### Simulation & telemetry
 - Real-time Matplotlib dashboard
 - Configurable update rate, seed, interference probability, and client count
+- Built-in `baseline`, `crowded`, and `quiet` scenario presets
 - Moving Bluetooth nodes
 - Wi-Fi hub-and-spoke topology
 - Signal attenuation model
@@ -80,16 +81,25 @@ python main.py
 
 ### Configure a run
 
-The dashboard now accepts reproducible runtime controls:
+The dashboard accepts reproducible runtime controls:
 
 ```bash
 python main.py --seed 42 --fps 30 --block-probability 0.08 --clients 5
 ```
 
+Or select a built-in scenario:
+
+```bash
+python main.py --scenario crowded
+```
+
+Scenario details are documented separately in [`docs/scenarios.md`](docs/scenarios.md).
+
 - `--seed`: deterministic simulation seed
 - `--fps`: dashboard update rate
 - `--block-probability`: per-channel simulated interference probability from `0` to `1`
 - `--clients`: number of simulated Wi-Fi clients
+- `--scenario`: `baseline`, `crowded`, or `quiet`
 
 Run tests:
 
@@ -119,12 +129,17 @@ The snapshot includes delivery rate, delivered/dropped packets, average latency,
 ```text
 WaveForge/
 ├── .github/workflows/python-app.yml
+├── docs/
+│   └── scenarios.md
 ├── src/
 │   ├── __init__.py
 │   ├── engine.py
+│   ├── scenarios.py
 │   ├── simulator.py
 │   └── utils.py
-├── tests/test_engine.py
+├── tests/
+│   ├── test_engine.py
+│   └── test_scenarios.py
 ├── main.py
 ├── requirements.txt
 ├── requirements-dev.txt
