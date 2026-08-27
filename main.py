@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import json
 
+from src.benchmark import run_benchmark
 from src.simulator import SimulationConfig, run
 
 
@@ -10,13 +12,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the WaveForge software-only wireless simulator")
     parser.add_argument("--seed", type=int, default=7, help="deterministic simulation seed")
     parser.add_argument("--fps", type=int, default=30, help="dashboard update rate")
-    parser.add_argument(
-        "--block-probability",
-        type=float,
-        default=0.06,
-        help="per-channel interference probability (0..1)",
-    )
+    parser.add_argument("--block-probability", type=float, default=0.06, help="per-channel interference probability (0..1)")
     parser.add_argument("--clients", type=int, default=3, help="number of simulated Wi-Fi clients")
+    parser.add_argument("--benchmark", type=int, default=None, metavar="STEPS", help="run headlessly for STEPS and print JSON telemetry")
     return parser.parse_args()
 
 
@@ -28,6 +26,9 @@ def main() -> None:
         channel_block_probability=args.block_probability,
         client_count=args.clients,
     )
+    if args.benchmark is not None:
+        print(json.dumps(run_benchmark(args.benchmark, config), sort_keys=True))
+        return
     run(config)
 
 
