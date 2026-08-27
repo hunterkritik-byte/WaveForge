@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import random
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -32,7 +32,7 @@ class SimulationConfig:
 class Simulation:
     """Own simulation state and telemetry; no physical radio access is performed."""
 
-    def __init__(self, config: SimulationConfig | None = None, seed: int | None = None):
+    def __init__(self, config: Optional[SimulationConfig] = None, seed: Optional[int] = None):
         self.config = config or SimulationConfig(seed=7 if seed is None else seed)
         if seed is not None:
             self.config = SimulationConfig(
@@ -115,7 +115,7 @@ class Simulation:
         self.power["Wi-Fi"] += self.rng.uniform(50, 100)
 
 
-def run(config: SimulationConfig | None = None) -> None:
+def run(config: Optional[SimulationConfig] = None) -> None:
     """Run the dual-panel educational dashboard."""
     sim = Simulation(config)
     fig, (ax_bt, ax_wifi) = plt.subplots(1, 2, figsize=(13, 6))
