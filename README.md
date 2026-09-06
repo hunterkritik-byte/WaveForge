@@ -2,7 +2,7 @@
 
 **Software-only wireless network simulator for exploring Bluetooth Adaptive Frequency Hopping and Wi-Fi IP routing.**
 
-WaveForge turns wireless concepts into an interactive simulation without radio hardware or physical network access. It models protocol behavior, interference, attenuation, routing, latency, delivery rate, RSSI, and power as software-only abstractions. The original project concept contrasts Bluetooth 79-channel AFH with Wi-Fi hub-and-spoke routing.
+WaveForge turns wireless concepts into an interactive simulation without radio hardware or physical network access. It models protocol behavior, interference, attenuation, routing, latency, delivery rate, RSSI, and power as software-only abstractions.
 
 ## ✨ Features
 
@@ -32,6 +32,7 @@ WaveForge turns wireless concepts into an interactive simulation without radio h
 - Average RSSI telemetry
 - Comparative power-consumption telemetry
 - Deterministic runs for reproducible experiments
+- **Headless JSON telemetry mode for CI, notebooks, and regression experiments**
 
 ### Developer experience
 - Modular `src/` architecture
@@ -40,6 +41,16 @@ WaveForge turns wireless concepts into an interactive simulation without radio h
 - Pytest regression suite
 - GitHub Actions on Python 3.9–3.12
 - No compiled binaries or physical-radio dependencies
+
+## 🧪 Headless experiment mode
+
+Run the simulation without opening a GUI and emit machine-readable telemetry:
+
+```bash
+python main.py --steps 100 --seed 42 --json
+```
+
+This makes WaveForge easier to use in automated tests and reproducible experiments. The output contains tick count, delivered/dropped packets, delivery rate, average latency, RSSI, and simulated power units.
 
 ## 🖥️ Architecture
 
@@ -63,7 +74,7 @@ WaveForge turns wireless concepts into an interactive simulation without radio h
                  │                     │
                  └──────────┬──────────┘
                             ▼
-                    Matplotlib Dashboard
+                 Dashboard / JSON output
 ```
 
 ## 🚀 Quick start
@@ -80,16 +91,15 @@ python main.py
 
 ### Configure a run
 
-The dashboard now accepts reproducible runtime controls:
-
 ```bash
 python main.py --seed 42 --fps 30 --block-probability 0.08 --clients 5
 ```
 
-- `--seed`: deterministic simulation seed
-- `--fps`: dashboard update rate
-- `--block-probability`: per-channel simulated interference probability from `0` to `1`
-- `--clients`: number of simulated Wi-Fi clients
+### Run a reproducible headless experiment
+
+```bash
+python main.py --seed 42 --steps 500 --json > telemetry.json
+```
 
 Run tests:
 
@@ -105,7 +115,7 @@ The `Simulation` object exposes a lightweight `telemetry()` snapshot for experim
 ```python
 from src.simulator import Simulation
 
-sim = Simulation()
+sim = Simulation(seed=42)
 for _ in range(10):
     sim.step()
 
@@ -113,28 +123,6 @@ print(sim.telemetry())
 ```
 
 The snapshot includes delivery rate, delivered/dropped packets, average latency, average RSSI, and accumulated Bluetooth/Wi-Fi power units.
-
-## 📁 Project layout
-
-```text
-WaveForge/
-├── .github/workflows/python-app.yml
-├── src/
-│   ├── __init__.py
-│   ├── engine.py
-│   ├── simulator.py
-│   └── utils.py
-├── tests/test_engine.py
-├── main.py
-├── requirements.txt
-├── requirements-dev.txt
-├── LICENSE
-└── README.md
-```
-
-## 📐 Modeling notes
-
-The physics in WaveForge is intentionally educational rather than a standards-compliant RF propagation simulator. The attenuation helper uses a simplified inverse-power model, and the RSSI helper uses a log-distance approximation. Packet delivery uses the resulting signal factor and simulated channel availability. Power values are simulation units rather than measurements from real hardware.
 
 ## 🛡️ Safety boundary
 
