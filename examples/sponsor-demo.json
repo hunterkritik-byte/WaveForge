@@ -1,0 +1,9 @@
+{
+  "name": "sponsor-demo",
+  "seed": 2026,
+  "steps": 500,
+  "clients": 6,
+  "block_probability": 0.12,
+  "notes": "Repeatable demo profile for evaluating wireless simulation, telemetry, and reporting workflows",
+  "tags": ["demo", "hardware-validation", "telemetry"]
+}
