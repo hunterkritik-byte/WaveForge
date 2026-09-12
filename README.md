@@ -33,6 +33,8 @@ WaveForge turns wireless concepts into an interactive simulation without radio h
 - Comparative power-consumption telemetry
 - Deterministic runs for reproducible experiments
 - **Headless JSON telemetry mode for CI, notebooks, and regression experiments**
+- **Per-step experiment history reports**
+- **Aggregate experiment summaries and run-to-run comparison helpers**
 
 ### Developer experience
 - Modular `src/` architecture
@@ -51,6 +53,33 @@ python main.py --steps 100 --seed 42 --json
 ```
 
 This makes WaveForge easier to use in automated tests and reproducible experiments. The output contains tick count, delivered/dropped packets, delivery rate, average latency, RSSI, and simulated power units.
+
+### Experiment reports
+
+Capture one telemetry snapshot per simulation step:
+
+```bash
+python main.py --steps 100 --seed 42 --report history
+```
+
+Get aggregate statistics for a run:
+
+```bash
+python main.py --steps 100 --seed 42 --report summary
+```
+
+The experiment helpers can also be used from Python:
+
+```python
+from src.experiments import compare_histories, run_experiment, summarize_history
+from src.simulator import Simulation
+
+baseline = run_experiment(Simulation(seed=42), 100)
+candidate = run_experiment(Simulation(seed=43), 100)
+
+print(summarize_history(candidate))
+print(compare_histories(baseline, candidate))
+```
 
 ## 🖥️ Architecture
 
@@ -75,6 +104,8 @@ This makes WaveForge easier to use in automated tests and reproducible experimen
                  └──────────┬──────────┘
                             ▼
                  Dashboard / JSON output
+                            │
+                     Experiment Reports
 ```
 
 ## 🚀 Quick start
