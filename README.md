@@ -1,10 +1,12 @@
 # ⚡ WaveForge
 
-**Software-only wireless network simulator for exploring Bluetooth Adaptive Frequency Hopping and Wi-Fi IP routing.**
+**Software-only wireless network simulator for exploring Bluetooth Adaptive Frequency Hopping, Wi-Fi routing, interference, telemetry, and reproducible hardware-validation workflows.**
 
-WaveForge turns wireless concepts into an interactive simulation without radio hardware or physical network access. It models protocol behavior, interference, attenuation, routing, latency, delivery rate, RSSI, and power as software-only abstractions.
+WaveForge turns wireless concepts into an interactive simulation without radio hardware or physical network access. It provides a safe software layer for experimenting with protocol behavior before committing to prototype hardware.
 
-## ✨ Features
+> **Hardware roadmap:** WaveForge is designed to grow from a simulation and research tool into a repeatable pre-prototype validation platform. Hardware partners can use the project to evaluate scenarios, compare design assumptions, and define what should be measured on future prototypes.
+
+## ✨ What it can do today
 
 ### Bluetooth
 - 79-channel Adaptive Frequency Hopping model
@@ -23,18 +25,17 @@ WaveForge turns wireless concepts into an interactive simulation without radio h
 
 ### Simulation & telemetry
 - Real-time Matplotlib dashboard
-- Configurable update rate, seed, interference probability, and client count
+- Configurable seed, update rate, interference probability, and client count
 - Moving Bluetooth nodes
 - Wi-Fi hub-and-spoke topology
-- Signal attenuation model
-- Simulated environmental noise
-- Packet-delivery and latency telemetry
-- Average RSSI telemetry
-- Comparative power-consumption telemetry
+- Signal attenuation and environmental-noise models
+- Packet delivery, latency, RSSI, and simulated power telemetry
 - Deterministic runs for reproducible experiments
-- **Headless JSON telemetry mode for CI, notebooks, and regression experiments**
-- **Per-step experiment history reports**
-- **Aggregate experiment summaries and run-to-run comparison helpers**
+- Headless JSON telemetry for CI and notebooks
+- Per-step experiment history
+- Aggregate summaries and run-to-run comparisons
+- **Portable scenario presets and JSON scenario files**
+- **Exportable JSON and Markdown experiment reports**
 
 ### Developer experience
 - Modular `src/` architecture
@@ -44,69 +45,33 @@ WaveForge turns wireless concepts into an interactive simulation without radio h
 - GitHub Actions on Python 3.9–3.12
 - No compiled binaries or physical-radio dependencies
 
-## 🧪 Headless experiment mode
+## 🧪 Repeatable scenarios
 
-Run the simulation without opening a GUI and emit machine-readable telemetry:
-
-```bash
-python main.py --steps 100 --seed 42 --json
-```
-
-This makes WaveForge easier to use in automated tests and reproducible experiments. The output contains tick count, delivered/dropped packets, delivery rate, average latency, RSSI, and simulated power units.
-
-### Experiment reports
-
-Capture one telemetry snapshot per simulation step:
+Built-in profiles make demos and design reviews reproducible:
 
 ```bash
-python main.py --steps 100 --seed 42 --report history
+python main.py --scenario baseline
+python main.py --scenario dense-interference
+python main.py --scenario low-power
 ```
 
-Get aggregate statistics for a run:
+Or load a scenario owned by your team:
 
 ```bash
-python main.py --steps 100 --seed 42 --report summary
+python main.py --scenario-file examples/sponsor-demo.json
 ```
 
-The experiment helpers can also be used from Python:
+A scenario records its seed, run length, client count, interference assumptions, notes, and tags. This gives researchers and future hardware teams a stable starting point for comparing revisions.
 
-```python
-from src.experiments import compare_histories, run_experiment, summarize_history
-from src.simulator import Simulation
+## 📊 Export a design-review report
 
-baseline = run_experiment(Simulation(seed=42), 100)
-candidate = run_experiment(Simulation(seed=43), 100)
+Generate machine-readable results and a lightweight report without adding database or cloud dependencies:
 
-print(summarize_history(candidate))
-print(compare_histories(baseline, candidate))
+```bash
+python main.py --scenario dense-interference --export-json artifacts/run.json --export-md artifacts/run.md
 ```
 
-## 🖥️ Architecture
-
-```text
-                         WAVEFORGE
-                            │
-              ┌─────────────┴─────────────┐
-              ▼                           ▼
-       BLUETOOTH MODEL                WI-FI MODEL
-              │                           │
-       79-channel AFH              Router / IP table
-              │                           │
-      Interference map            Client destinations
-              └─────────────┬─────────────┘
-                            ▼
-                    Simulation Engine
-                            │
-                 ┌──────────┴──────────┐
-                 ▼                     ▼
-             Physics               Telemetry
-                 │                     │
-                 └──────────┬──────────┘
-                            ▼
-                 Dashboard / JSON output
-                            │
-                     Experiment Reports
-```
+The JSON export contains raw samples plus aggregate statistics. The Markdown export is suitable for attaching to a prototype/design review and records that the measurements came from the deterministic software-only model.
 
 ## 🚀 Quick start
 
@@ -132,32 +97,72 @@ python main.py --seed 42 --fps 30 --block-probability 0.08 --clients 5
 python main.py --seed 42 --steps 500 --json > telemetry.json
 ```
 
-Run tests:
+### Run the regression suite
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-## 📊 Telemetry API
+## 🧩 Example workflow for hardware teams
 
-The `Simulation` object exposes a lightweight `telemetry()` snapshot for experiments and tests:
+1. **Define** — describe the target topology and operating assumptions as a scenario.
+2. **Simulate** — run baseline and stress profiles with fixed seeds.
+3. **Compare** — export telemetry and review delivery, latency, RSSI, and power trends.
+4. **Prototype** — translate the highest-value assumptions into a future PCB/enclosure test plan.
+5. **Validate** — compare future measured hardware data against the software baseline.
 
-```python
-from src.simulator import Simulation
+WaveForge deliberately stops at the simulation boundary today. It does not claim that simulated RF results are a substitute for certified or laboratory measurements.
 
-sim = Simulation(seed=42)
-for _ in range(10):
-    sim.step()
+## 🗺️ Roadmap
 
-print(sim.telemetry())
+- [x] Deterministic Bluetooth/Wi-Fi simulation
+- [x] Headless telemetry and experiment history
+- [x] Scenario presets and portable JSON profiles
+- [x] JSON/Markdown experiment exports
+- [ ] Pluggable PHY/model interfaces
+- [ ] Hardware-measurement import format for prototype comparison
+- [ ] Scenario schema versioning and migration tooling
+- [ ] Optional dashboard for long-running experiment comparison
+- [ ] Reference prototype specification and BOM once hardware resources are available
+
+## 🤝 Hardware partnership / sponsorship
+
+WaveForge is an open-source project and is currently focused on building a credible simulation and validation workflow before physical prototyping. Support from a hardware manufacturing or engineering partner could accelerate the next phase through **prototype PCB fabrication, component sourcing, enclosure development, assembly, testing, and engineering feedback**.
+
+A partner would get a clear, reproducible software testbed and a public project that can document the transition from simulation assumptions to prototype validation. Any partnership should be agreed explicitly; the repository does not imply endorsement by any manufacturer.
+
+## 🖥️ Architecture
+
+```text
+                         WAVEFORGE
+                            │
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+       BLUETOOTH MODEL                WI-FI MODEL
+              │                           │
+       79-channel AFH              Router / IP table
+              │                           │
+      Interference map            Client destinations
+              └─────────────┬─────────────┘
+                            ▼
+                    Simulation Engine
+                            │
+                 ┌──────────┴──────────┐
+                 ▼                     ▼
+             Physics               Telemetry
+                 │                     │
+                 └──────────┬──────────┘
+                            ▼
+                Scenarios / Reports / Dashboard
+                            │
+                       Future Hardware
+                         Validation
 ```
-
-The snapshot includes delivery rate, delivered/dropped packets, average latency, average RSSI, and accumulated Bluetooth/Wi-Fi power units.
 
 ## 🛡️ Safety boundary
 
-WaveForge is a **simulation-only** project. It does not access wireless interfaces, capture real frames, transmit packets, perform deauthentication, jam frequencies, scan nearby networks, or interfere with third-party systems. It is intended for education, visualization, algorithm development, and deterministic testing.
+WaveForge is a **simulation-only** project. It does not access wireless interfaces, capture real frames, transmit packets, perform deauthentication, jam frequencies, scan nearby networks, or interfere with third-party systems. It is intended for education, visualization, algorithm development, deterministic testing, and pre-prototype engineering analysis.
 
 ## 📜 License
 
